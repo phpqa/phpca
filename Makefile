@@ -112,10 +112,6 @@ docker-compose-test-image:
 	@export IMAGE_NAME="$(DOCKER_REPO):$(DOCKERFILE_TAG)"; \
 		docker-compose --file $(DOCKER_COMPOSE_FILE_PATH) --project-name $(THIS_DIRECTORY) build
 
-	@printf "$(STYLE_TITLE)Running the image from the $(DOCKER_COMPOSE_FILE_PATH) file $(STYLE_RESET)\\n"
-	@docker-compose --file $(DOCKER_COMPOSE_FILE_PATH) --project-name $(THIS_DIRECTORY) --no-ansi up --detach
-	@docker logs -f $(THIS_DIRECTORY)_sut_1
-
 # Clean the image from the docker-compose.test.yml file
 clean-docker-compose-test-image:
 
@@ -256,8 +252,8 @@ test-docker-compose-image:
 	@printf "Image \"%s\" was built: " "$(THIS_DIRECTORY)_sut"
 	@$(call status_after_run, test -n "$$(docker image ls $(THIS_DIRECTORY)_sut --quiet)")
 
-	@printf "Container can run with the settings from $(DOCKER_COMPOSE_FILE_PATH): "
-	@$(call status_after_run, docker wait $(THIS_DIRECTORY)_sut_1)
+	@printf "Compose file \"%s\" was able to run with image \"%s\": " "$(DOCKER_COMPOSE_FILE_PATH)" "$(THIS_DIRECTORY)_sut"
+	@$(call status_after_run, docker-compose --file $(DOCKER_COMPOSE_FILE_PATH) --project-name $(THIS_DIRECTORY) --no-ansi up --abort-on-container-exit --exit-code-from sut)
 
 # Run all tests in verbose mode
 tests-verbose:
